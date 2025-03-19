@@ -40,7 +40,7 @@ define(['octane'], function(octane) {
 // Option 1: Local file
 <script src="path/to/octane.iife.js"></script>
 // Option 2: Using CDN (jsDelivr, minified)
-<script src="https://cdn.jsdelivr.net/gh/Radiiplus/octane@main/octane.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/Radiiplus/octane@main/octane.min.js"></script>
 // Then use it as:
 octane.ready(() => {
   console.log('Ready!');
@@ -50,7 +50,7 @@ octane.ready(() => {
 // Option 1: Local file
 <script src="path/to/octane.js"></script>
 // Option 2: Using CDN (jsDelivr, minified)
-<script src="https://cdn.jsdelivr.net/gh/Radiiplus/octane@main/octane.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/Radiiplus/octane@main/octane.min.js"></script>
 // Just include the script and use window.octane
 ```
 
