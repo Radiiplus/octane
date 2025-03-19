@@ -37,7 +37,7 @@ define(['octane'], function(octane) {
 });
 
 // IIFE via Script Tag (Browser)
-<script src="path/to/octane.iife.js"></script>
+<script src="path/to/octane.js"></script>
 // Then use it as:
 octane.ready(() => {
   console.log('Ready!');
