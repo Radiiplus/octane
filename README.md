@@ -37,7 +37,7 @@ define(['octane'], function(octane) {
 });
 
 // IIFE via Script Tag (Browser)
-<script src="path/to/octane.js"></script>
+<script src="path/to/octane.iife.js"></script>
 // Then use it as:
 octane.ready(() => {
   console.log('Ready!');
@@ -60,6 +60,15 @@ const buttons = octane('.btn'); // Selects all .btn elements
 // Execute code when DOM is fully loaded
 octane.ready(() => {
   console.log('DOM is fully loaded and ready');
+});
+
+// Scoped query with octane.query
+const container = octane('#container');
+const buttons = octane.query('.btn', container); // Scoped query within #container
+buttons.forEach(button => {
+  octane.events.on(button, 'click', () => {
+    console.log('Button clicked');
+  });
 });
 ```
 
@@ -309,7 +318,7 @@ Octane simplifies form serialization and validation.
 
 ```javascript
 // Serialize form to object
-const form = document.querySelector('form');
+const form = octane.query('form'); // Use octane.query
 const formData = octane.utils.form.serialize(form);
 
 // Validate form data
@@ -421,9 +430,10 @@ const counter = octane.component('counter', () => {
     </div>
   `);
   
-  octane.events.on(el.querySelector('.increment'), 'click', () => {
+  // Use octane.query for scoped queries
+  octane.events.on(octane.query('.increment', el), 'click', () => {
     count++;
-    el.querySelector('.value').textContent = count;
+    octane.query('.value', el).textContent = count;
   });
   
   return el;
