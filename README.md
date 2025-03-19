@@ -23,6 +23,11 @@ Octane is a lightweight, modular JavaScript utility library designed to simplify
 Octane supports multiple module formats: CommonJS, AMD, and global variable.
 
 ```javascript
+// ESM (ECMAScript Modules)
+import octane from 'octane';
+// or specific modules
+import { dom, events } from 'octane';
+
 // CommonJS (Node.js)
 const octane = require('octane');
 
@@ -31,8 +36,16 @@ define(['octane'], function(octane) {
   // Your code here
 });
 
+// IIFE via Script Tag (Browser)
+<script src="path/to/octane.iife.js"></script>
+// Then use it as:
+octane.ready(() => {
+  console.log('Ready!');
+});
+
 // Global variable (Browser)
 // Just include the script and use window.octane
+<script src="path/to/octane.js"></script>
 ```
 
 ## Core Features
