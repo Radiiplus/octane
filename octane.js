@@ -7,7 +7,7 @@
     global.octane = factory();
   }
 })(typeof window !== 'undefined' ? window : this, function() {
-  const [state, watchers, eventHandlers] = [new Map(), new Map(), new Map()];
+  const [state, watchers, eventHandlers, components] = [new Map(), new Map(), new Map(), new Map()];
   const HFE = ['scroll', 'resize', 'mousemove', 'touchmove', 'pointermove', 'mouseover', 'mouseout', 'touchstart', 'touchend', 'wheel', 'input', 'dragover', 'animationframe'];
   const D3 = 5;
 
@@ -116,18 +116,22 @@
       return eventUtils.storeHandler(element, eventName, wrappedHandler, options);
     },
     off: (el, eventName, handler) => {
-      const element = octane(el);
-      if (!element) return null;
-      if (typeof handler === 'string') {
-        eventUtils.removeHandler(handler);
-      } else if (eventName.includes(' ')) {
-        eventName.split(' ').forEach(evt => events.off(element, evt, handler));
-      } else if (Array.isArray(element)) {
-        element.forEach(elem => events.off(elem, eventName, handler));
-      } else {
-        element.removeEventListener(eventName, handler);
-      }
-    },
+  const element = octane(el);
+  if (!element) return null;
+  if (!eventName || typeof eventName !== 'string') {
+    console.error('Invalid eventName:', eventName);
+    return null;
+  }
+  if (typeof handler === 'string') {
+    eventUtils.removeHandler(handler);
+  } else if (eventName.includes(' ')) {
+    eventName.split(' ').forEach(evt => events.off(element, evt, handler));
+  } else if (Array.isArray(element)) {
+    element.forEach(elem => events.off(elem, eventName, handler));
+  } else {
+    element.removeEventListener(eventName, handler);
+  }
+},
     trigger: (el, eventName, detail = null, options = {}) => {
       const element = octane(el);
       if (!element) return null;
