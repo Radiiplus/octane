@@ -1,6 +1,6 @@
 # Octane Library Documentation
 
-Octane is a lightweight, modular JavaScript utility library designed to simplify common tasks in web development. It provides tools for DOM manipulation, event handling, state management, storage, animations, and more.
+Octane is a lightweight, modular JavaScript utility library designed to simplify common tasks in web development. It provides tools for DOM manipulation, event handling, state management, storage, animations, mutation observation, and more.
 
 ## Table of Contents
 
@@ -16,6 +16,7 @@ Octane is a lightweight, modular JavaScript utility library designed to simplify
 - [Form Handling](#form-handling)
 - [URL and History](#url-and-history)
 - [Debugging Tools](#debugging-tools)
+- [Mutation Observer](#mutation-observer)
 - [Advanced Usage](#advanced-usage)
 
 ## Installation
@@ -70,8 +71,8 @@ octane.ready(() => {
 
 // Scoped query with octane.query
 const container = octane('#container');
-const buttons = octane.query('.btn', container); // Scoped query within #container
-buttons.forEach(button => {
+const scopedButtons = octane.query('.btn', container); // Scoped query within #container
+scopedButtons.forEach(button => {
   octane.events.on(button, 'click', () => {
     console.log('Button clicked');
   });
@@ -79,8 +80,8 @@ buttons.forEach(button => {
 ```
 
 The main function `octane()` is an element selector that supports both single and multiple element selection:
-- When selecting multiple elements, it returns an array
-- When selecting a single element, it returns just that element
+- When selecting multiple elements, it returns an array.
+- When selecting a single element, it returns just that element.
 
 ## DOM Manipulation
 
@@ -120,17 +121,17 @@ if (octane.dom.classes.has(div, 'active')) {
 ```
 
 Available methods:
-- `octane.dom.create(tag)`: Creates a new DOM element
-- `octane.dom.add(parent, child)`: Appends a child element to a parent
-- `octane.dom.remove(el)`: Removes an element from the DOM
-- `octane.dom.attr(el, name, value)`: Gets or sets attributes (supports object notation)
-- `octane.dom.css(el, styles)`: Applies CSS styles to an element
-- `octane.dom.html(el, content)`: Gets or sets the inner HTML of an element
-- `octane.dom.text(el, content)`: Gets or sets the text content of an element
-- `octane.dom.classes.add(el, ...classes)`: Adds classes to an element
-- `octane.dom.classes.remove(el, ...classes)`: Removes classes from an element
-- `octane.dom.classes.toggle(el, className)`: Toggles a class on an element
-- `octane.dom.classes.has(el, className)`: Checks if an element has a specific class
+- `octane.dom.create(tag)`: Creates a new DOM element.
+- `octane.dom.add(parent, child)`: Appends a child element to a parent.
+- `octane.dom.remove(el)`: Removes an element from the DOM.
+- `octane.dom.attr(el, name, value)`: Gets or sets attributes (supports object notation).
+- `octane.dom.css(el, styles)`: Applies CSS styles to an element.
+- `octane.dom.html(el, content)`: Gets or sets the inner HTML of an element.
+- `octane.dom.text(el, content)`: Gets or sets the text content of an element.
+- `octane.dom.classes.add(el, ...classes)`: Adds classes to an element.
+- `octane.dom.classes.remove(el, ...classes)`: Removes classes from an element.
+- `octane.dom.classes.toggle(el, className)`: Toggles a class on an element.
+- `octane.dom.classes.has(el, className)`: Checks if an element has a specific class.
 
 ## Event Handling
 
@@ -170,13 +171,13 @@ Octane automatically handles debouncing for high-frequency events like:
 - input, dragover, animationframe
 
 Available methods:
-- `octane.events.on(el, eventName, handler, options)`: Attaches an event listener
-- `octane.events.off(el, eventName, handler)`: Removes an event listener
-- `octane.events.trigger(el, eventName, detail, options)`: Triggers a custom event
+- `octane.events.on(el, eventName, handler, options)`: Attaches an event listener.
+- `octane.events.off(el, eventName, handler)`: Removes an event listener.
+- `octane.events.trigger(el, eventName, detail, options)`: Triggers a custom event.
 
 Event options:
-- `delegate`: CSS selector for event delegation
-- `debounce`: Set to false to disable automatic debouncing, or provide a custom delay in milliseconds
+- `delegate`: CSS selector for event delegation.
+- `debounce`: Set to false to disable automatic debouncing, or provide a custom delay in milliseconds.
 
 ## State Management
 
@@ -198,9 +199,9 @@ unsubscribe();
 ```
 
 Available methods:
-- `octane.state.set(key, value)`: Sets a state value and triggers watchers
-- `octane.state.get(key)`: Retrieves a state value
-- `octane.state.watch(key, callback)`: Watches for changes to a state value (returns unsubscribe function)
+- `octane.state.set(key, value)`: Sets a state value and triggers watchers.
+- `octane.state.get(key)`: Retrieves a state value.
+- `octane.state.watch(key, callback)`: Watches for changes to a state value (returns an unsubscribe function).
 
 ## Storage Utilities
 
@@ -225,9 +226,9 @@ octane.storage.cookie('token', 'abc123', {
 ```
 
 Available methods:
-- `octane.storage.local(key, value)`: Manages localStorage with JSON serialization
-- `octane.storage.session(key, value)`: Manages sessionStorage with JSON serialization
-- `octane.storage.cookie(key, value, options)`: Manages cookies with additional options
+- `octane.storage.local(key, value)`: Manages localStorage with JSON serialization.
+- `octane.storage.session(key, value)`: Manages sessionStorage with JSON serialization.
+- `octane.storage.cookie(key, value, options)`: Manages cookies with additional options.
 
 ## Networking and Workers
 
@@ -249,16 +250,16 @@ const worker = octane.network.worker('worker.js', {
 // Send data to worker
 worker.send({ task: 'process', data: [1, 2, 3] });
 
-// Add custom event listeners
-worker.on('messageerror', handleError);
+// Add custom event listeners to worker
+worker.on('messageerror', errorHandler);
 
 // Terminate worker when done
 worker.terminate();
 ```
 
 Available methods:
-- `octane.network.fetch(url, options)`: Wrapper around the Fetch API
-- `octane.network.worker(scriptUrl, options)`: Creates and manages Web Workers
+- `octane.network.fetch(url, options)`: Wrapper around the Fetch API.
+- `octane.network.worker(scriptUrl, options)`: Creates and manages Web Workers.
 
 ## Utilities
 
@@ -287,10 +288,10 @@ const greet = octane.utils.fn(function(name) {
 ```
 
 Available methods:
-- `octane.utils.delay(ms)`: Returns a promise that resolves after a delay
-- `octane.utils.template(string, data)`: Interpolates template strings with data
-- `octane.utils.animate(el, keyframes, options)`: Wrapper for the Web Animations API
-- `octane.utils.fn(func)`: Abstracts both arrow and traditional functions
+- `octane.utils.delay(ms)`: Returns a promise that resolves after a delay.
+- `octane.utils.template(string, data)`: Interpolates template strings with data.
+- `octane.utils.animate(el, keyframes, options)`: Wrapper for the Web Animations API.
+- `octane.utils.fn(func)`: Wraps a function to ensure consistent behavior.
 
 ## Components
 
@@ -315,8 +316,8 @@ document.body.appendChild(myButton);
 ```
 
 Available methods:
-- `octane.component(name, template)`: Creates a reusable component
-- `component.render(props)`: Renders a component with the given props
+- `octane.component(name, template)`: Creates a reusable component.
+- `component.render(props)`: Renders a component with the given props.
 
 ## Form Handling
 
@@ -343,8 +344,8 @@ if (Object.keys(errors).length === 0) {
 ```
 
 Available methods:
-- `octane.utils.form.serialize(form)`: Converts form data into an object
-- `octane.utils.form.validate(data, rules)`: Validates data based on provided rules
+- `octane.utils.form.serialize(form)`: Converts form data into an object.
+- `octane.utils.form.validate(data, rules)`: Validates data based on provided rules.
 
 ## URL and History
 
@@ -368,11 +369,11 @@ octane.utils.url.clear();
 ```
 
 Available methods:
-- `octane.utils.url.get(key)`: Gets a query parameter
-- `octane.utils.url.set(key, value)`: Sets a query parameter and updates URL
-- `octane.utils.url.getAll()`: Gets all query parameters as an object
-- `octane.utils.url.remove(key)`: Removes a query parameter
-- `octane.utils.url.clear()`: Removes all query parameters
+- `octane.utils.url.get(key)`: Gets a query parameter.
+- `octane.utils.url.set(key, value)`: Sets a query parameter and updates URL.
+- `octane.utils.url.getAll()`: Gets all query parameters as an object.
+- `octane.utils.url.remove(key)`: Removes a query parameter.
+- `octane.utils.url.clear()`: Removes all query parameters.
 
 ## Debugging Tools
 
@@ -390,9 +391,27 @@ console.table(octane.debug.state());
 ```
 
 Available methods:
-- `octane.debug.log(message)`: Logs messages with '[Octane]' prefix
-- `octane.debug.error(message)`: Logs errors with '[Octane]' prefix
-- `octane.debug.state()`: Returns the current state as an object for inspection
+- `octane.debug.log(message)`: Logs messages with the '[Octane]' prefix.
+- `octane.debug.error(message)`: Logs errors with the '[Octane]' prefix.
+- `octane.debug.state()`: Returns the current state as an object for inspection.
+
+## Mutation Observer
+
+Octane provides a mutation observer utility to efficiently monitor DOM changes
+
+```javascript
+// Observe mutations on a target element or an array of targets
+octane.mutation.observe(targetElement, (mutation, observer) => {
+  console.log('Mutation detected:', mutation);
+}, { attributes: true, childList: true, subtree: true });
+
+// Disconnect mutation observation for a target element or an array of targets
+octane.mutation.disconnect(targetElement);
+```
+
+Available methods:
+- `octane.mutation.observe(target, callback, options)`: Observes mutations on the target element(s) with the given callback and options. Default options are `{ attributes: true, childList: true, subtree: true }`.
+- `octane.mutation.disconnect(target)`: Disconnects mutation observation for the specified target element(s).
 
 ## Advanced Usage
 
@@ -414,15 +433,15 @@ Many Octane DOM methods return the element, allowing for method chaining:
 
 ```javascript
 const div = octane.dom.create('div');
-octane.dom.attr(div, 'id', 'container')
-  .dom.classes.add(div, 'panel')
-  .dom.html(div, '<p>Content</p>')
-  .dom.add(document.body, div);
+octane.dom.attr(div, 'id', 'container');
+octane.dom.classes.add(div, 'panel');
+octane.dom.html(div, '<p>Content</p>');
+octane.dom.add(document.body, div);
 ```
 
 ### Dynamic Components
 
-Create dynamic components with state:
+Create dynamic components with internal state:
 
 ```javascript
 const counter = octane.component('counter', () => {
