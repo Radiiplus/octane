@@ -10,7 +10,7 @@
   const [state, watchers, eventHandlers, components] = [new Map(), new Map(), new Map(), new Map()];
   const HFE = ['scroll', 'resize', 'mousemove', 'touchmove', 'pointermove', 'mouseover', 'mouseout', 'touchstart', 'touchend', 'wheel', 'input', 'dragover', 'animationframe'];
   const D3 = 5;
-
+  
   const debounce = (fn, delay) => {
     let timeoutId;
     return function(...args) {
@@ -50,18 +50,15 @@
     let elements;
     if (Array.isArray(selector)) {
       elements = selector;
-    }
-    else if (typeof selector === 'string') {
+    } else if (typeof selector === 'string') {
       if (context && typeof context.querySelector === 'function') {
         elements = Array.from(context.querySelectorAll(selector));
       } else {
         elements = Array.from(document.querySelectorAll(selector));
       }
-    }
-    else if (selector && typeof selector.nodeType === 'number') {
+    } else if (selector && typeof selector.nodeType === 'number') {
       elements = [selector];
-    }
-    else {
+    } else {
       throw new Error(`Invalid selector: ${selector}`);
     }
     if (options.array) {
@@ -116,22 +113,22 @@
       return eventUtils.storeHandler(element, eventName, wrappedHandler, options);
     },
     off: (el, eventName, handler) => {
-  const element = octane(el);
-  if (!element) return null;
-  if (!eventName || typeof eventName !== 'string') {
-    console.error('Invalid eventName:', eventName);
-    return null;
-  }
-  if (typeof handler === 'string') {
-    eventUtils.removeHandler(handler);
-  } else if (eventName.includes(' ')) {
-    eventName.split(' ').forEach(evt => events.off(element, evt, handler));
-  } else if (Array.isArray(element)) {
-    element.forEach(elem => events.off(elem, eventName, handler));
-  } else {
-    element.removeEventListener(eventName, handler);
-  }
-},
+      const element = octane(el);
+      if (!element) return null;
+      if (!eventName || typeof eventName !== 'string') {
+        console.error('Invalid eventName:', eventName);
+        return null;
+      }
+      if (typeof handler === 'string') {
+        eventUtils.removeHandler(handler);
+      } else if (eventName.includes(' ')) {
+        eventName.split(' ').forEach(evt => events.off(element, evt, handler));
+      } else if (Array.isArray(element)) {
+        element.forEach(elem => events.off(elem, eventName, handler));
+      } else {
+        element.removeEventListener(eventName, handler);
+      }
+    },
     trigger: (el, eventName, detail = null, options = {}) => {
       const element = octane(el);
       if (!element) return null;
@@ -222,7 +219,7 @@
         history.pushState({}, '', location.pathname);
       }
     },
-    fn: (func) => {
+    fn: func => {
       if (typeof func !== 'function') {
         throw new Error('Expected a function');
       }
@@ -240,6 +237,56 @@
       return () => watchers.get(key).splice(watchers.get(key).indexOf(callback), 1);
     }
   };
+
+  const OBSL = 20;
+  const mutationObservers = [];
+  function getObs() {
+    for (let entry of mutationObservers) {
+      if (entry.elements.size < OBSL) {
+        return entry;
+      }
+    }
+    const newEntry = {
+      observer: null,
+      elements: new Map()
+    };
+    newEntry.observer = new MutationObserver((mutations, obs) => {
+      mutations.forEach(mutation => {
+        const cb = newEntry.elements.get(mutation.target);
+        if (cb && typeof cb === 'function') {
+          cb(mutation, obs);
+        }
+      });
+    });
+    mutationObservers.push(newEntry);
+    return newEntry;
+  }
+  function obs(target, callback, options) {
+    if (!target) {
+      throw new Error('No target provided for mutation observer');
+    }
+    const targets = Array.isArray(target) ? target : [target];
+    targets.forEach(el => {
+      const observerEntry = getObs();
+      observerEntry.elements.set(el, callback);
+      observerEntry.observer.observe(el, options || { attributes: true, childList: true, subtree: true });
+    });
+  }
+  function unobs(target) {
+    const targets = Array.isArray(target) ? target : [target];
+    targets.forEach(el => {
+      for (let entry of mutationObservers) {
+        if (entry.elements.has(el)) {
+          entry.elements.delete(el);
+          entry.observer.disconnect();
+          entry.elements.forEach((cb, observedEl) => {
+            entry.observer.observe(observedEl, { attributes: true, childList: true, subtree: true });
+          });
+          break;
+        }
+      }
+    });
+  }
 
   const component = (name, template) => {
     components.set(name, template);
@@ -266,7 +313,11 @@
     utils,
     state: stateManager,
     component,
-    ready
+    ready,
+    mutation: {
+      observe: obs,
+      disconnect: unobs
+    }
   });
 
   return octane;
