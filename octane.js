@@ -142,30 +142,46 @@
   };
 
   const storage = {
-    local: (key, value) =>
-      value === undefined
-        ? localStorage.getItem(key)
-        : value === null
-        ? localStorage.removeItem(key)
-        : (localStorage.setItem(key, JSON.stringify(value)), value),
-    session: (key, value) =>
-      value === undefined
-        ? sessionStorage.getItem(key)
-        : value === null
-        ? sessionStorage.removeItem(key)
-        : (sessionStorage.setItem(key, JSON.stringify(value)), value),
+    local: (key, value) => {
+      if (value === undefined) {
+        const stored = localStorage.getItem(key);
+        return stored !== null ? JSON.parse(stored) : null;
+      }
+      if (value === null) {
+        localStorage.removeItem(key);
+        return null;
+      }
+      localStorage.setItem(key, JSON.stringify(value));
+      return value;
+    },
+    session: (key, value) => {
+      if (value === undefined) {
+        const stored = sessionStorage.getItem(key);
+        return stored !== null ? JSON.parse(stored) : null;
+      }
+      if (value === null) {
+        sessionStorage.removeItem(key);
+        return null;
+      }
+      sessionStorage.setItem(key, JSON.stringify(value));
+      return value;
+    },
     cookie: (key, value, options = {}) => {
       if (value === undefined) {
         const cookieRow = document.cookie.split('; ').find(row => row.startsWith(`${key}=`));
-        return cookieRow ? cookieRow.split('=')[1] : undefined;
+        return cookieRow ? cookieRow.split('=')[1] : null;
+      }
+      if (value === null) {
+        document.cookie = `${key}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
+        return null;
       }
       const cookieString = `${key}=${value}` +
         `${options.expires ? `; expires=${new Date(options.expires).toUTCString()}` : ''}` +
-        `${options.path ? `; path=${options.path}` : ''}` +
+        `${options.path ? `; path=${options.path}` : '; path=/'}` +
         `${options.domain ? `; domain=${options.domain}` : ''}` +
         `${options.secure ? '; secure' : ''}`;
       document.cookie = cookieString;
-      return octane;
+      return value;
     }
   };
 
