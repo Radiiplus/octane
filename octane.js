@@ -230,7 +230,13 @@
   };
 
   const stateManager = {
-    set: (key, value) => (state.set(key, value), (watchers.get(key) || []).forEach(fn => fn(value)), value),
+    set: (key, value) => {
+      const currentValue = state.get(key);
+      if (currentValue === value) return value;
+      state.set(key, value);
+      (watchers.get(key) || []).forEach(fn => fn(value));
+      return value;
+    },
     get: key => state.get(key),
     watch: (key, callback) => {
       watchers.set(key, [...(watchers.get(key) || []), callback]);
