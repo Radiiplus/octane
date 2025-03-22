@@ -140,42 +140,65 @@
         : element.dispatchEvent(event);
     }
   };
+  function autoSerialize(value) {
+    if (typeof value === 'string') {
+      try {
+        const parsed = JSON.parse(value);
+        if (JSON.stringify(parsed) === value) {
+          return value;
+        }
+      } catch (e) {
+      }
+    }
+    return JSON.stringify(value);
+  }
+
+  function autoDeserialize(value) {
+    try {
+      return JSON.parse(value);
+    } catch (e) {
+      return value;
+    }
+  }
 
   const storage = {
     local: (key, value) => {
       if (value === undefined) {
         const stored = localStorage.getItem(key);
-        return stored !== null ? JSON.parse(stored) : null;
+        return stored !== null ? autoDeserialize(stored) : null;
       }
       if (value === null) {
         localStorage.removeItem(key);
         return null;
       }
-      localStorage.setItem(key, JSON.stringify(value));
+      localStorage.setItem(key, autoSerialize(value));
       return value;
     },
     session: (key, value) => {
       if (value === undefined) {
         const stored = sessionStorage.getItem(key);
-        return stored !== null ? JSON.parse(stored) : null;
+        return stored !== null ? autoDeserialize(stored) : null;
       }
       if (value === null) {
         sessionStorage.removeItem(key);
         return null;
       }
-      sessionStorage.setItem(key, JSON.stringify(value));
+      sessionStorage.setItem(key, autoSerialize(value));
       return value;
     },
     cookie: (key, value, options = {}) => {
       if (value === undefined) {
         const cookieRow = document.cookie.split('; ').find(row => row.startsWith(`${key}=`));
-        return cookieRow ? cookieRow.split('=')[1] : null;
+        if (!cookieRow) return null;
+        const cookieVal = cookieRow.split('=')[1];
+        return autoDeserialize(cookieVal);
       }
       if (value === null) {
         document.cookie = `${key}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
         return null;
       }
-      const cookieString = `${key}=${value}` +
+      const serializedValue = autoSerialize(value);
+      const cookieString = `${key}=${serializedValue}` +
         `${options.expires ? `; expires=${new Date(options.expires).toUTCString()}` : ''}` +
         `${options.path ? `; path=${options.path}` : '; path=/'}` +
         `${options.domain ? `; domain=${options.domain}` : ''}` +
