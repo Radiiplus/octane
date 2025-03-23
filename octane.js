@@ -140,15 +140,13 @@
         : element.dispatchEvent(event);
     }
   };
+
   function autoSerialize(value) {
     if (typeof value === 'string') {
-      try {
-        const parsed = JSON.parse(value);
-        if (JSON.stringify(parsed) === value) {
-          return value;
-        }
-      } catch (e) {
+      if (value.length && value[0] === '"' && value[value.length - 1] === '"') {
+        return value;
       }
+      return value;
     }
     return JSON.stringify(value);
   }
