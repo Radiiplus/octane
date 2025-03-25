@@ -93,53 +93,56 @@
   };
 
   const events = {
-    on: (el, eventName, handler, options = {}) => {
-      const element = octane(el);
-      if (!element) return null;
-      if (options.delegate) {
-        const delegatedHandler = eventUtils.delegate(element, options.delegate, eventName, handler);
-        const wrappedHandler = eventUtils.wrapEventHandler(delegatedHandler, eventName, options);
-        element.addEventListener(eventName, wrappedHandler, options);
-        return eventUtils.storeHandler(element, eventName, wrappedHandler, options);
-      }
-      if (eventName.includes(' ')) {
-        return eventName.split(' ').map(evt => events.on(element, evt, handler, options));
-      }
-      if (Array.isArray(element)) {
-        return element.map(elem => events.on(elem, eventName, handler, options));
-      }
-      const wrappedHandler = eventUtils.wrapEventHandler(handler, eventName, options);
+  on: (el, eventName, handler, options = {}) => {
+    let element = el;
+    if (typeof el === 'string') {
+      element = octane(el);
+    }
+    if (!element) return null;
+    if (options.delegate) {
+      const delegatedHandler = eventUtils.delegate(element, options.delegate, eventName, handler);
+      const wrappedHandler = eventUtils.wrapEventHandler(delegatedHandler, eventName, options);
       element.addEventListener(eventName, wrappedHandler, options);
       return eventUtils.storeHandler(element, eventName, wrappedHandler, options);
-    },
-    off: (el, eventName, handler) => {
-      const element = octane(el);
-      if (!element) return null;
-      if (!eventName || typeof eventName !== 'string') {
-        console.error('Invalid eventName:', eventName);
-        return null;
-      }
-      if (typeof handler === 'string') {
-        eventUtils.removeHandler(handler);
-      } else if (eventName.includes(' ')) {
-        eventName.split(' ').forEach(evt => events.off(element, evt, handler));
-      } else if (Array.isArray(element)) {
-        element.forEach(elem => events.off(elem, eventName, handler));
-      } else {
-        element.removeEventListener(eventName, handler);
-      }
-    },
-    trigger: (el, eventName, detail = null, options = {}) => {
-      const element = octane(el);
-      if (!element) return null;
-      const event = detail !== null
-        ? new CustomEvent(eventName, { bubbles: true, cancelable: true, ...options, detail })
-        : new Event(eventName, { bubbles: true, cancelable: true, ...options });
-      Array.isArray(element)
-        ? element.forEach(elem => elem.dispatchEvent(event))
-        : element.dispatchEvent(event);
     }
-  };
+    if (eventName.includes(' ')) {
+      return eventName.split(' ').map(evt => events.on(element, evt, handler, options));
+    }
+    if (Array.isArray(element)) {
+      return element.map(elem => events.on(elem, eventName, handler, options));
+    }
+    const wrappedHandler = eventUtils.wrapEventHandler(handler, eventName, options);
+    element.addEventListener(eventName, wrappedHandler, options);
+    return eventUtils.storeHandler(element, eventName, wrappedHandler, options);
+  },
+  off: (el, eventName, handler) => {
+    const element = octane(el);
+    if (!element) return null;
+    if (!eventName || typeof eventName !== 'string') {
+      console.error('Invalid eventName:', eventName);
+      return null;
+    }
+    if (typeof handler === 'string') {
+      eventUtils.removeHandler(handler);
+    } else if (eventName.includes(' ')) {
+      eventName.split(' ').forEach(evt => events.off(element, evt, handler));
+    } else if (Array.isArray(element)) {
+      element.forEach(elem => events.off(elem, eventName, handler));
+    } else {
+      element.removeEventListener(eventName, handler);
+    }
+  },
+  trigger: (el, eventName, detail = null, options = {}) => {
+    const element = octane(el);
+    if (!element) return null;
+    const event = detail !== null
+      ? new CustomEvent(eventName, { bubbles: true, cancelable: true, ...options, detail })
+      : new Event(eventName, { bubbles: true, cancelable: true, ...options });
+    Array.isArray(element)
+      ? element.forEach(elem => elem.dispatchEvent(event))
+      : element.dispatchEvent(event);
+  }
+};
 
   function autoSerialize(value) {
     if (typeof value === 'string') {
