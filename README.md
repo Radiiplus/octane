@@ -1,6 +1,6 @@
 # Octane Library Documentation
 
-Octane is a lightweight, modular JavaScript utility library designed to simplify common tasks in web development. It provides tools for DOM manipulation, event handling, state management, storage (including IndexedDB and Cache Storage), animations, mutation observation, and more.
+Octane is a lightweight, modular JavaScript utility library designed to simplify common tasks in web development. It provides tools for DOM manipulation, event handling, state management, storage, animations, mutation observation, and more.
 
 ## Table of Contents
 
