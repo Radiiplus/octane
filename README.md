@@ -340,30 +340,31 @@ Available methods:
 - `octane.utils.form.serialize(form)`
 - `octane.utils.form.validate(data, rules)`
 
-## URL and History
+### URL-Based Navigation
 
-Octane provides utilities for managing query parameters and browser history.
+Using the URL utilities, you can modify the URL's query parameters and push new states to the browser history without reloading the page. This allows for seamless navigation and state management in single-page applications.
 
 ```javascript
 // Get a single parameter
 const page = octane.utils.url.get('page');
 
-// Set a parameter (updates URL)
+// Set a parameter (updates URL and pushes a new state)
 octane.utils.url.set('filter', 'active');
 
 // Get all parameters as an object
 const allParams = octane.utils.url.getAll();
 
-// Remove a parameter
+// Remove a parameter and update the URL
 octane.utils.url.remove('sort');
 
-// Clear all parameters
+// Clear all parameters, resetting the URL
 octane.utils.url.clear();
 ```
 
 Available methods:
 - `octane.utils.url.get(key)`
-- `octane.utils.url.set(key, value)`
+- `octane.utils.url.set(key, value)`  
+  (Internally uses `history.pushState` to update the URL)
 - `octane.utils.url.getAll()`
 - `octane.utils.url.remove(key)`
 - `octane.utils.url.clear()`
